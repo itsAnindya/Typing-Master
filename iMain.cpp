@@ -80,6 +80,7 @@ void showLeaderboard();
 void loadProfileList();
 void filecpy(char src[], char dest[]);
 void deleteProfile(int selectedProfile); // takes 1-8 as input.
+void switchSound();
 
 // User Profile
 int userCount;
@@ -283,15 +284,15 @@ unsigned short checkRect() // Checks the interesting rectangles inside which the
 	}
 	else if (optionsMenu)
 	{
-		if (mousePos.x >= 79 && mousePos.x <= 249 && mousePos.y >= 586 && mousePos.y <= 631)
-		{
-			keyboardControl = false;
-			return 2;
-		}
-		if (mousePos.x >= 67 && mousePos.x <= 429 && mousePos.y >= 296 && mousePos.y <= 347)
+		if (mousePos.x >= 67 && mousePos.x <= 422 && mousePos.y >= 302 && mousePos.y <= 343)
 		{
 			keyboardControl = false;
 			return 1;
+		}
+		else if (mousePos.x >= 84 && mousePos.x <= 249 && mousePos.y >= 589 && mousePos.y <= 631)
+		{
+			keyboardControl = false;
+			return 2;
 		}
 		if (!keyboardControl)
 		{
@@ -584,9 +585,13 @@ void createMenu()
 		"assets\\image\\profile\\loadProfile_1.bmp",
 		"assets\\image\\profile\\loadProfile_2.bmp",
 		"assets\\image\\profile\\loadProfile_3.bmp"};
-	char optionScr[2][80] = {
+	char optionScr[3][80] = {
 		"assets\\image\\options\\options.bmp",
-		"assets\\image\\options\\options_1.bmp"};
+		"assets\\image\\options\\options_1.bmp",
+		"assets\\image\\options\\options_2.bmp"};
+	char option_audioScr[2][80] = {
+		"assets\\image\\options\\options_audio_off.bmp",
+		"assets\\image\\options\\options_audio_on.bmp"};
 	menuButton = checkRect();
 	if (menu)
 	{
@@ -637,7 +642,8 @@ void createMenu()
 	}
 	else if (optionsMenu)
 	{
-		iShowBMP2(0, 0, optionScr[sound], 0);
+		iShowBMP2(0, 0, optionScr[menuButton], 0);
+		iShowBMP2(0, 0, option_audioScr[sound], 0);
 	}
 }
 
@@ -910,16 +916,7 @@ void iMouse(int button, int state, int mx, int my)
 		}
 		else if (!keyboardControl && menuButton == 1)
 		{
-			if (!sound)
-			{
-				sound = 1;
-				PlaySoundA(".\\assets\\audio\\bgmusic", NULL, SND_LOOP | SND_ASYNC);
-			}
-			else
-			{
-				sound = 0;
-				PlaySound(0, 0, 0);
-			}
+			switchSound();
 			menuButton = 0;
 		}
 	}
@@ -1415,7 +1412,7 @@ void createUser(char *username)
 void sort_users()
 {
 	int temp;
-	for (int i = 0; i < userCount-1; i++)
+	for (int i = 0; i < userCount - 1; i++)
 	{
 		for (int j = i + 1; j < userCount; j++)
 		{
@@ -1427,7 +1424,7 @@ void sort_users()
 			}
 		}
 	}
-	for(int i = 0; i < userCount; i++)
+	for (int i = 0; i < userCount; i++)
 	{
 		std::cout << user[user_sortedList[i]].best_net_wpm << "  ";
 	}
@@ -1513,4 +1510,18 @@ void deleteProfile(int selectedProfile)
 	fprintf(usercount_fp, "%d", userCount);
 	fclose(usercount_fp);
 	loadUsers();
+}
+
+void switchSound()
+{
+	if (!sound)
+	{
+		sound = true;
+		PlaySoundA(".\\assets\\audio\\bgmusic.wav", NULL, SND_LOOP | SND_ASYNC);
+	}
+	else
+	{
+		sound = false;
+		PlaySoundA(0, 0, 0);
+	}
 }
