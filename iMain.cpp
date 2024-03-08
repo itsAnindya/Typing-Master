@@ -29,7 +29,8 @@
 
 int timer[10];
 char screenText[50][1000];
-char bgdir[100] = "assets\\image\\background.bmp";
+char bgdir[2][100] = {"assets\\image\\background.bmp",
+					  "assets\\image\\background2.bmp"};
 int currentCursorIndex = 0, currentLineIndex = 0, maxLineIndex = 10;
 int line_x_pos = 40, line_y_pos = 380;
 int max_cols = 100;
@@ -67,6 +68,7 @@ char durationText[20];
 char username_display[33]; // This text is shown in createprofile menu while typing
 int totalParagraphLength = 0;
 int user_sortedList[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+unsigned short theme = 0;
 unsigned short selectedProfileNo = 0;
 unsigned short loggedInProfileNo = 0;
 bool logInStatus = false;
@@ -294,6 +296,11 @@ unsigned short checkRect() // Checks the interesting rectangles inside which the
 			keyboardControl = false;
 			return 2;
 		}
+		// else if (mousePos.x >= 78 && mousePos.x <= 226 && mousePos.y >= 374 && mousePos.y <= 416)
+		// {
+		// 	keyboardControl = false;
+		// 	return 3;
+		// }
 		if (!keyboardControl)
 		{
 			return 0;
@@ -585,10 +592,15 @@ void createMenu()
 		"assets\\image\\profile\\loadProfile_1.bmp",
 		"assets\\image\\profile\\loadProfile_2.bmp",
 		"assets\\image\\profile\\loadProfile_3.bmp"};
-	char optionScr[3][80] = {
+	char optionScr[4][80] = {
 		"assets\\image\\options\\options.bmp",
 		"assets\\image\\options\\options_1.bmp",
 		"assets\\image\\options\\options_2.bmp"};
+	// char optionScr_ThemeButton[4][80] = {
+	// 	"assets\\image\\options\\themeButton.bmp",
+	// 	"assets\\image\\options\\themeButton.bmp",
+	// 	"assets\\image\\options\\themeButton.bmp",
+	// 	"assets\\image\\options\\themeButton_1.bmp"};
 	char option_audioScr[2][80] = {
 		"assets\\image\\options\\options_audio_off.bmp",
 		"assets\\image\\options\\options_audio_on.bmp"};
@@ -644,6 +656,7 @@ void createMenu()
 	{
 		iShowBMP2(0, 0, optionScr[menuButton], 0);
 		iShowBMP2(0, 0, option_audioScr[sound], 0);
+		// iShowBMP2(0, 0, optionScr_ThemeButton[menuButton], 0);
 	}
 }
 
@@ -744,7 +757,7 @@ void iDraw()
 	} // This rectangle defines the background of the UI
 	else
 	{
-		iShowBMP(0, 0, bgdir); // Background Image
+		iShowBMP(0, 0, bgdir[theme]); // Background Image
 	}
 	if (GRIDLINES)
 	{
@@ -887,11 +900,13 @@ void iMouse(int button, int state, int mx, int my)
 			{
 				menu = false;
 				profilemenu = true;
+				menuButton = 0;
 			}
 			else if (!keyboardControl && menuButton == 3)
 			{
 				menu = false;
 				optionsMenu = true;
+				menuButton = 0;
 			}
 			else if (!keyboardControl && menuButton == 4)
 			{
@@ -919,6 +934,11 @@ void iMouse(int button, int state, int mx, int my)
 			switchSound();
 			menuButton = 0;
 		}
+		else if (!keyboardControl && menuButton == 3)
+		{
+			theme = 1 - theme;
+			menuButton = 0;
+		}
 	}
 	else if (playmenu)
 	{
@@ -934,18 +954,6 @@ void iMouse(int button, int state, int mx, int my)
 			{
 				playmenu = false;
 				durationSelection = true;
-				menuButton = 0;
-			}
-		}
-	}
-	else if (optionsMenu)
-	{
-		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-		{
-			if (!keyboardControl && menuButton == 2)
-			{
-				optionsMenu = false;
-				menu = true;
 				menuButton = 0;
 			}
 		}
@@ -1285,6 +1293,8 @@ void iKeyboard(unsigned char key)
 		{
 			typing = false;
 			result = true;
+			loadUsers();
+			list_netWPM();
 		}
 	}
 }
@@ -1494,6 +1504,10 @@ void filecpy(char src[], char dest[])
 void deleteProfile(int selectedProfile)
 {
 	char profile[50], oldFileName[50], newFileName[50];
+	if (selectedProfile == loggedInProfileNo)
+	{
+		logInStatus = false;
+	}
 	sprintf(profile, "user\\user_%d.txt", selectedProfile - 1);
 	remove(profile);
 	int i = selectedProfile;
