@@ -923,21 +923,24 @@ void iMouse(int button, int state, int mx, int my)
 	}
 	else if (optionsMenu)
 	{
-		if (!keyboardControl && menuButton == 2)
+		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 		{
-			optionsMenu = false;
-			menu = true;
-			menuButton = 0;
-		}
-		else if (!keyboardControl && menuButton == 1)
-		{
-			switchSound();
-			menuButton = 0;
-		}
-		else if (!keyboardControl && menuButton == 3)
-		{
-			theme = 1 - theme;
-			menuButton = 0;
+			if (!keyboardControl && menuButton == 2)
+			{
+				optionsMenu = false;
+				menu = true;
+				menuButton = 0;
+			}
+			else if (!keyboardControl && menuButton == 1)
+			{
+				switchSound();
+				menuButton = 0;
+			}
+			else if (!keyboardControl && menuButton == 3)
+			{
+				theme = 1 - theme;
+				menuButton = 0;
+			}
 		}
 	}
 	else if (playmenu)
